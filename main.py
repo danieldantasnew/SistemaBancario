@@ -1,12 +1,31 @@
-class Banco:
-    saldo: float = 0
-    extrato: str = ''
-    numero_saques_realizados: int = 0
-    LIMITE_DE_SAQUES: int = 3
-    limite_por_saque: float = 500
+class Conta:
+    def __init__(self, numero_conta):
+        self.agencia: str = "0001"
+        self.numero_conta = numero_conta
 
+    def mostrar_conta(self):
+        return f"Agência: {self.agencia} Conta: {self.numero_conta}"
+
+class Usuario:
+    def __init__(self) -> None:
+        self.nome:str = ''
+        self.data_de_nascimento:str = ''
+        self.cpf:str = ''
+        self.endereco:str = ''
+        self.conta: Conta|None = None
+
+
+class Banco:
     def __init__(self, nome_banco: str) -> None:
+        self.numero_de_contas = 0
         self.nome_banco = nome_banco
+        self.saldo: float = 0
+        self.extrato: str = ''
+        self.numero_saques_realizados: int = 0
+        self.LIMITE_DE_SAQUES: int = 3
+        self.limite_por_saque: float = 500
+        self.contas = []
+        self.usuarios = []
 
     def nome_do_banco(self):
         return self.nome_banco
@@ -70,6 +89,27 @@ class Banco:
     def consultar_saldo(self):
         print(f"SALDO ATUAL: {self.saldo}")
 
+    def criar_usuario(self):
+        usuario = Usuario()
+        usuario.nome = input("Digite o nome do usuário: ").strip()
+        usuario.cpf = input("Digite o seu CPF: ").strip()
+        usuario.data_de_nascimento = input("Digite a sua data de nascimento: ").strip()
+        usuario.endereco = input("Digite o seu endereço completo: ").strip()
+        self.numero_de_contas+=1
+        usuario.conta = Conta(self.numero_de_contas)
+        self.usuarios.append(usuario)
+        self.contas.append(usuario.conta)
+        print(f"Usuário {usuario.nome} | {usuario.conta.mostrar_conta()} | criado com sucesso!")
+    
+    def listar_contas(self):
+        for conta in self.contas:
+            print(f"\nAgência: {conta.agencia} Conta: {conta.numero_conta}")
+    
+    def listar_usuarios(self):
+        for usuario in self.usuarios:
+            print(f"\n Usuário: {usuario.nome} CPF: {usuario.cpf} Conta: {usuario.conta.numero_conta}")
+    
+
 
 def menu(nome_banco: str): 
     return f"""
@@ -78,6 +118,9 @@ def menu(nome_banco: str):
         [2] Sacar
         [3] Extrato
         [4] Consultar Saldo
+        [5] Criar Usuário/Conta
+        [6] Listar Contas
+        [7] Listar Usuarios
         [0] Sair
     """
 
@@ -98,6 +141,15 @@ while True:
     
     elif(opcao == '4'):
         tesla_bank.consultar_saldo()
+
+    elif(opcao == '5'):
+        tesla_bank.criar_usuario()
+
+    elif(opcao == '6'):
+        tesla_bank.listar_contas()
+        
+    elif(opcao == '7'):
+        tesla_bank.listar_usuarios()
     
     elif(opcao == '0'):
         print(f"Obrigado por usar {tesla_bank.nome_do_banco()}")
