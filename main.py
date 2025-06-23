@@ -1,7 +1,8 @@
 class Conta:
-    def __init__(self, numero_conta):
+    def __init__(self, numero_conta, usuario):
         self.agencia: str = "0001"
         self.numero_conta = numero_conta
+        self.usuario_conta = usuario
 
     def mostrar_conta(self):
         return f"Agência: {self.agencia} Conta: {self.numero_conta}"
@@ -89,18 +90,39 @@ class Banco:
     def consultar_saldo(self):
         print(f"SALDO ATUAL: {self.saldo}")
 
+    def ja_existe_cpf(self, cpf):
+        return any(cpf == usuario.cpf for usuario in self.usuarios)
+    
+    def existe_usuario(self, nome_usuario):
+        return any(nome_usuario == usuario.nome for usuario in self.usuarios)
+    
     def criar_usuario(self):
         usuario = Usuario()
         usuario.nome = input("Digite o nome do usuário: ").strip()
         usuario.cpf = input("Digite o seu CPF: ").strip()
+        while self.ja_existe_cpf(usuario.cpf):
+            print('Já existe um usuário cadastrado com este CPF.')
+            usuario.cpf = input("Digite o seu CPF: ").strip()
+
         usuario.data_de_nascimento = input("Digite a sua data de nascimento: ").strip()
         usuario.endereco = input("Digite o seu endereço completo: ").strip()
         self.numero_de_contas+=1
-        usuario.conta = Conta(self.numero_de_contas)
+        usuario.conta = Conta(self.numero_de_contas, usuario.nome)
         self.usuarios.append(usuario)
         self.contas.append(usuario.conta)
         print(f"Usuário {usuario.nome} | {usuario.conta.mostrar_conta()} | criado com sucesso!")
-    
+
+    def criar_nova_conta(self):
+        usuario = input("Digite o seu usuário: ").strip()
+        while not self.existe_usuario(usuario):
+            print("Digite um usuário existente!")
+            usuario = input("Digite o seu usuário: ").strip()
+        self.numero_de_contas+=1
+        nova_conta = Conta(self.numero_de_contas, usuario)
+        self.contas.append(nova_conta)
+        print(f"Conta: {nova_conta.numero_conta} | Agência: {nova_conta.agencia} criados com sucesso para o usuário {usuario}")
+        
+
     def listar_contas(self):
         for conta in self.contas:
             print(f"\nAgência: {conta.agencia} Conta: {conta.numero_conta}")
@@ -119,8 +141,9 @@ def menu(nome_banco: str):
         [3] Extrato
         [4] Consultar Saldo
         [5] Criar Usuário/Conta
-        [6] Listar Contas
-        [7] Listar Usuarios
+        [6] Criar Nova Conta
+        [7] Listar Contas
+        [8] Listar Usuarios
         [0] Sair
     """
 
@@ -146,9 +169,12 @@ while True:
         tesla_bank.criar_usuario()
 
     elif(opcao == '6'):
-        tesla_bank.listar_contas()
+        tesla_bank.criar_nova_conta()
         
     elif(opcao == '7'):
+        tesla_bank.listar_contas()
+    
+    elif(opcao == '8'):
         tesla_bank.listar_usuarios()
     
     elif(opcao == '0'):
